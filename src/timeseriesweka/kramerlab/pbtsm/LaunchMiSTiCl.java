@@ -316,7 +316,6 @@ public class LaunchMiSTiCl extends BaseLauncherSAX {
         int seed;
         // For each dataset
         for (String dataset : datasets) {
-            System.out.println(dataset);
             // Create a RealValuedDataset object which loads the training and testing splits
             rvDataset = new RealValuedDataset(dataDir, dataset);
 

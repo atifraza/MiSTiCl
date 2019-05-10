@@ -258,7 +258,7 @@ public class MiSTiCl extends BasePbTSM {
         this.seed = seed;
         
         // String mining executable name
-        this.STRING_MINER = stringMinerFileName;
+        this.STRING_MINER = Paths.get(System.getProperty("user.dir"), stringMinerFileName).toString();
         
         // String miner parameters
         this.LOG_V = Integer.toString(log_v);
@@ -387,7 +387,7 @@ public class MiSTiCl extends BasePbTSM {
         int window = pair.getWindowSize();
         
         // Extract the frequent patterns for the current Alpha, Window pair symbolic form
-        ProcessBuilder processBuilder = new ProcessBuilder("./" + this.STRING_MINER);
+        ProcessBuilder processBuilder = new ProcessBuilder();
         Process process;
         
         Map<Double, Map<Double, Map<Double, List<String>>>> map_ClassValues_UnfilteredFreqStrings = new HashMap<>();
@@ -399,7 +399,7 @@ public class MiSTiCl extends BasePbTSM {
         long timer = System.currentTimeMillis();
         
         for (Double classValue : this.getClsValsToInstCountsMap().keySet()) {
-            processBuilder.command("./" + this.STRING_MINER, LOG_V, BLOCK_SIZE, "2",
+            processBuilder.command(this.STRING_MINER, LOG_V, BLOCK_SIZE, "2",
                                    Paths.get(TEMP_DIR, fileNamePrefix + classValue.intValue() + "vsALL.fasta")
                                         .toString(),
                                    Paths.get(TEMP_DIR, fileNamePrefix + "ALLvs" + classValue.intValue() + ".fasta")
