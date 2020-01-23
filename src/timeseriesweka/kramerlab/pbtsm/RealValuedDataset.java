@@ -4,17 +4,23 @@ import java.io.IOException;
 
 import java.nio.file.Paths;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import utilities.ClassifierTools;
 import utilities.InstanceTools;
 
 import weka.core.Instances;
 
 public class RealValuedDataset {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(RealValuedDataset.class);
 
     private final String DATASET_NAME;
 
-    private final Instances TRAIN_SET;
-    private final Instances TEST_SET;
+    private final Map<SplitType, Instances> DATASET_SPLITS = new HashMap<>();
 
     /**
      * Construct a Real-valued dataset object containing a training and test set in ARFF format.
@@ -28,22 +34,23 @@ public class RealValuedDataset {
      */
     public RealValuedDataset(String pathToDataDir, String datasetName) throws IOException {
         this.DATASET_NAME = datasetName;
-
+        Instances split;
         try {
-            TRAIN_SET = ClassifierTools.loadData(Paths.get(pathToDataDir, datasetName, "TRAIN.arff")
-                                                      .toFile());
-
-            TEST_SET = ClassifierTools.loadData(Paths.get(pathToDataDir, datasetName, "TEST.arff")
-                                                     .toFile());
+            split = ClassifierTools.loadData(Paths.get(pathToDataDir, datasetName,
+                                                       "TRAIN.arff").toFile());
+            DATASET_SPLITS.put(SplitType.TRAIN, split);
+            
+            split = ClassifierTools.loadData(Paths.get(pathToDataDir, datasetName,
+                                                       "TEST.arff").toFile());
+            DATASET_SPLITS.put(SplitType.TEST, split);
         } catch (IOException e) {
-            throw new IOException("Error loading dataset file(s).\n\n"
-                                  + "Make sure files are located as per the following structure:\n"
-                                  + "pathToDataDir\n"
-                                  + "    |\n"
-                                  + "    |-datasetName\n"
-                                  + "          |\n"
-                                  + "          |-TRAIN.arff\n"
-                                  + "          |-TEST.arff\n", e);
+            LOGGER.error("Error loading dataset file(s). Make sure files are located as per the following structure:\n"
+                         + "path/to/data-dir/\n"
+                         + "                |-dataset-name/\n"
+                         + "                              |-TRAIN.arff\n"
+                         + "                              |-TEST.arff\n\n{}",
+                         e.getMessage());
+            throw e;
         }
     }
 
@@ -64,7 +71,9 @@ public class RealValuedDataset {
      * @return An array of {@link Instances} containing the shuffled training and testing splits
      * respectively
      */
-    public Instances[] getShuffledDataset(int seed) {
-        return InstanceTools.resampleTrainAndTestInstances(this.TRAIN_SET, this.TEST_SET, seed);
+    public Instances[] getShuffledDatasetSplits(int seed) {
+        return InstanceTools.resampleTrainAndTestInstances(DATASET_SPLITS.get(SplitType.TRAIN),
+                                                           DATASET_SPLITS.get(SplitType.TEST),
+                                                           seed);
     }
 }

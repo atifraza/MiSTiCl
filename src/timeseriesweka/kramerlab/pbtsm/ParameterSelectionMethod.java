@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package timeseriesweka.kramerlab.pbtsm.misticl;
+package timeseriesweka.kramerlab.pbtsm;
 
 /**
  * BRF: Brute force
